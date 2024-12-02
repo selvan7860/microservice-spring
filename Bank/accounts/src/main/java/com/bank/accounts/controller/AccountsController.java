@@ -36,4 +36,30 @@ public class AccountsController {
                 .status(HttpStatus.OK)
                 .body(customerDto);
     }
+
+    @PutMapping
+    public ResponseEntity<ResponseDto> updateAccount(@RequestBody CustomerDto customerDto) {
+        boolean isUpdate = accountService.updateAccount(customerDto);
+        if(isUpdate){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(AccountConstants.STATUS_200, AccountConstants.MESSAGE_200));
+        }
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ResponseDto(AccountConstants.STATUS_500, AccountConstants.MESSAGE_500));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String mobile) {
+        boolean isDelete = accountService.deleteAccount(mobile);
+        if(isDelete){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(AccountConstants.STATUS_200, AccountConstants.MESSAGE_200));
+        }
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ResponseDto(AccountConstants.STATUS_500, AccountConstants.MESSAGE_500));
+    }
 }

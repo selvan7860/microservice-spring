@@ -56,6 +56,35 @@ public class AccountServiceImpl implements IAccountService {
         return customerDto;
     }
 
+    @Override
+    public boolean updateAccount(CustomerDto customerDto) {
+        boolean isUpdate = false;
+        AccountDto accountDto = customerDto.getAccountDto();
+        if(accountDto != null){
+            Account account = accountRepository.findByAccountNumber(accountDto.getAccountNumber())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account", "AccountNumber", accountDto.getAccountNumber()));
+            AccountMapper.mapToAccount(accountDto, account);
+            account = accountRepository.save(account);
+
+            String customerID = account.getCustomerID();
+            System.out.println(customerID);
+            Customer customer = customerRepository.findById(customerID)
+                    .orElseThrow(() -> new ResourceNotFoundException("Customer", "ID", customerID));
+            CustomerMapper.mapToCustomer(customerDto, customer);
+            customerRepository.save(customer);
+            isUpdate = true;
+        }
+        return isUpdate;
+    }
+
+    @Override
+    public boolean deleteAccount(String mobile) {
+        Customer customer = customerRepository.findByMobile(mobile).orElseThrow(() -> new ResourceNotFoundException("Customer", "Mobile", mobile));
+        accountRepository.deleteByCustomerID(customer.getId());
+        customerRepository.deleteById(customer.getId());
+        return true;
+    }
+
     private Account createAccount(Customer customer) {
         Account account = new Account();
         account.setCustomerID(customer.getId());
