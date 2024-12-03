@@ -5,12 +5,16 @@ import com.bank.accounts.constants.AccountConstants;
 import com.bank.accounts.dto.CustomerDto;
 import com.bank.accounts.dto.ResponseDto;
 import com.bank.accounts.service.IAccountService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/account")
+@Validated
 public class AccountsController {
 
     private final IAccountService accountService;
@@ -21,7 +25,7 @@ public class AccountsController {
 
 
     @PostMapping
-    public ResponseEntity<ResponseDto> createAccount(@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<ResponseDto> createAccount(@Valid  @RequestBody CustomerDto customerDto) {
         accountService.createAccount(customerDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -30,7 +34,9 @@ public class AccountsController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomerDto> fetchAccount(@RequestParam String mobile) {
+    public ResponseEntity<CustomerDto> fetchAccount(@RequestParam
+                                                        @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+                                                        String mobile) {
         CustomerDto customerDto = accountService.fetchAccount(mobile);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -51,7 +57,9 @@ public class AccountsController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String mobile) {
+    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam
+                                                         @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
+                                                         String mobile) {
         boolean isDelete = accountService.deleteAccount(mobile);
         if(isDelete){
             return ResponseEntity
